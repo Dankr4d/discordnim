@@ -1,5 +1,5 @@
 #include restapi
-import asyncdispatch, httpclient, asyncnet, tables, strutils, uri, options, json
+import asyncdispatch, httpclient, asyncnet, tables, strutils, uri, options, json, net
 import websocket, zip/zlib
 import endpoints, objects
 
@@ -300,7 +300,7 @@ proc resume(s: Shard) {.async, gcsafe.} =
 proc reconnect(s: Shard) {.async, gcsafe.} =
     await s.connection.close()
     try:
-        s.connection = await newAsyncWebsocketClient("gateway.discord.gg", Port 443, "/"&GATEWAYVERSION, true)
+        s.connection = await newAsyncWebsocketClient("gateway.discord.gg", Port 443, "/"&GATEWAYVERSION, true, sslContext = newContext())
     except:
         raise getCurrentException()
     s.sequence = 0
@@ -405,7 +405,8 @@ proc startSession*(s: Shard) {.async, gcsafe.} =
                 if wsurl.scheme == "wss": Port(443) else: Port(80),
                 wsurl.path&GATEWAYVERSION,
                 true,
-                useragent = static("Discordnim (https://github.com/Krognol/discordnim v" & $NimblePkgVersion & ")")
+                useragent = static("Discordnim (https://github.com/Krognol/discordnim v" & $NimblePkgVersion & ")"),
+                sslContext = newContext()
             )
     except:
         echo getCurrentExceptionMsg()

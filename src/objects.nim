@@ -518,7 +518,11 @@ type
         last_pin_timestamp*: string
         channel_id*: string
     MessageCreate* = Message
-    MessageUpdate* = Message
+    MessageUpdate* = object
+        id: string
+        embeds: seq[Embed]
+        channel_id: string
+        guild_id: string
     MessageDelete* = Message
     GuildMemberAdd* = GuildMember
     GuildMemberUpdate* = GuildMember
